@@ -26,14 +26,33 @@ int main() {
     }
 
     int fd = open("numbers", O_CREAT | O_WRONLY, 0644);
-    write(fd, nums, sizeof(nums));
-    close(fd);
+    if (fd != -1) {
+        int wr_stat = write(fd, nums, sizeof(nums));
+        if (wr_stat == -1) {
+            printf("WRITING FAILED!!");
+        }
+        close(fd);
+    } else {
+        printf("Couldn't open file");
+    }
 
+    int failure = 0;
     int fd2 = open("numbers", O_RDONLY);
     int nums2[10];
-
-    read(fd2, nums2, sizeof(nums));
-    close(fd2);
+    if (fd2 != -1) {
+        int rd_stat = read(fd2, nums2, sizeof(nums));
+        if (rd_stat == -1) {
+            printf("Reading failed, setting all vals to 0");
+            failure = 1;
+        }
+        close(fd2);
+    } else {
+        printf("open failed, setting all vals to 0");
+        failure = 0;
+    }
+    for(;failure && i < 10; i++) {
+        nums2[i] = 0;
+    }
     printf("\n\n\n");
     for(i = 0; i < 10; i++) {
         printf("rand num2 #%d: %u\n", i, nums2[i]);
